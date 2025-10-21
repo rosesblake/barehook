@@ -1,27 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  cubicBezier,
+  type Variants,
+} from "framer-motion";
 import Image from "next/image";
 
 const tabs = [
   { key: "overview", label: "Overview" },
-  { key: "curriculum", label: "What we cover" }, // renamed label only
+  { key: "process", label: "How we work" },
+  { key: "deepdives", label: "Optional deep dives" },
   { key: "contact", label: "Contact" },
-];
+] as const;
 
-const fade = {
+const easePrimary = cubicBezier(0.22, 1, 0.36, 1);
+const easeRibbon = cubicBezier(0.16, 1, 0.3, 1);
+
+const fade: Variants = {
   initial: { opacity: 0, y: 12 },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.45, ease: easePrimary },
   },
   exit: { opacity: 0, y: -8, transition: { duration: 0.25 } },
 };
 
 export default function Page() {
-  const [active, setActive] = useState("overview");
+  const [active, setActive] =
+    useState<(typeof tabs)[number]["key"]>("overview");
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-50 antialiased">
@@ -49,7 +59,7 @@ export default function Page() {
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: easePrimary }}
           className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[0.95]"
         >
           <span className="bg-clip-text text-transparent bg-[linear-gradient(180deg,#fff,rgba(255,255,255,0.85))]">
@@ -59,18 +69,19 @@ export default function Page() {
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, duration: 0.5 }}
+          transition={{ delay: 0.08, duration: 0.5, ease: easePrimary }}
           className="mx-auto mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-zinc-300"
         >
-          We’ll write the song you meant to write. If you want, we’ll also demo
-          or fully produce it. The goal is simple: a song you’re proud of and a
-          way to make the next one. No exams, just real studio methods.
+          This is one producer mentoring you 1:1. We will write the song you
+          meant to write. If you want, we will also demo or fully produce it.
+          The goal is a song you are proud of and a way to make the next one. No
+          exams. Real studio methods.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.16, duration: 0.5 }}
+          transition={{ delay: 0.16, duration: 0.5, ease: easePrimary }}
           className="mx-auto mt-8"
         >
           <a
@@ -120,7 +131,7 @@ export default function Page() {
             initial={{ scale: 1.05, opacity: 0.95 }}
             whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true, margin: "-10% 0%" }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.9, ease: easeRibbon }}
             className="group relative h-[18rem] md:h-[24rem] overflow-hidden"
           >
             <Image
@@ -141,17 +152,16 @@ export default function Page() {
                 Write first. Produce when it serves the song.
               </h3>
               <p className="mt-3 text-zinc-300">
-                I’m a songwriter and producer from Los Angeles, mentored by Jon
+                I am a songwriter and producer from Los Angeles, mentored by Jon
                 Lundin of Point North. Before producing I was the singer of Oh,
-                Weatherly, a band that reached over 15 million streams. I’ve
+                Weatherly, a band that reached over 15 million streams. I have
                 worked with artists including Plain White T’s, We The Kings, and
                 As It Is.
               </p>
               <p className="mt-3 text-zinc-300">
-                My focus is helping people channel how they feel into song and
-                using recording or production when it’s needed to reach their
-                goals. The aim is to actually hear a finished piece you’re proud
-                of.
+                My focus is helping you channel how you feel into song and using
+                recording or production only when it serves your goals. The aim
+                is to finish work you are proud of.
               </p>
             </div>
           </div>
@@ -198,9 +208,8 @@ export default function Page() {
                   <div className="rounded-2xl bg-zinc-900/60 p-6 backdrop-blur-sm ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                     <h3 className="text-xl font-semibold">Songwriting</h3>
                     <p className="mt-2 text-zinc-300">
-                      We’ll cover how songs start, how to shape verses and
-                      choruses, and how to write in a way that feels real to
-                      you.
+                      How songs start, shaping verses and choruses, writing in a
+                      way that feels like you.
                     </p>
                   </div>
                   <div className="rounded-2xl bg-zinc-900/60 p-6 backdrop-blur-sm ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
@@ -209,7 +218,7 @@ export default function Page() {
                     </h3>
                     <p className="mt-2 text-zinc-300">
                       Same writing focus, plus production. From simple demos to
-                      advanced sessions. We’ll expand only when it adds meaning.
+                      advanced sessions. We expand only when it adds meaning.
                     </p>
                   </div>
                 </div>
@@ -220,41 +229,38 @@ export default function Page() {
               </motion.div>
             )}
 
-            {active === "curriculum" && (
+            {active === "process" && (
               <motion.div
-                key="curriculum"
+                key="process"
                 variants={fade}
                 initial="initial"
                 animate="animate"
                 exit="exit"
                 className="p-8"
               >
-                <h2 id="curriculum" className="text-center text-2xl font-bold">
-                  What we cover
-                </h2>
+                <h2 className="text-center text-2xl font-bold">How we work</h2>
                 <p className="mx-auto mt-3 max-w-2xl text-center text-zinc-300">
-                  Every artist starts from a different place. Some come in with
-                  full songs, others just a voice note or an idea. We start
-                  where you are and build from there, covering both the creative
-                  and practical sides of songwriting.
+                  It is just me mentoring you 1:1. You might come in with a full
+                  song, a voice note, or only a feeling. We start where you are
+                  and move at your pace. The shape below is typical, not a rule.
                 </p>
                 <div className="mx-auto mt-8 grid max-w-3xl gap-4">
                   {[
                     {
-                      t: "Understanding your voice as a writer",
-                      b: "We get to know what draws emotion out of you and what you want to say. This shapes the foundation of your songwriting.",
+                      t: "Get your voice on the table",
+                      b: "What moves you, what you want to say, and references that feel right. This anchors the writing.",
                     },
                     {
-                      t: "Songwriting fundamentals",
-                      b: "If you’re new, we cover melody, rhythm, chords, and how songs are built. If you already write, we focus on refining your instincts.",
+                      t: "Core writing skills",
+                      b: "Melody, rhythm, chords, structure. If you already write, we refine instincts and make the page sing.",
                     },
                     {
-                      t: "Building your sound",
-                      b: "You’ll learn how arrangement and production can shape a song without overcomplicating it. We add as much or as little as your goals need.",
+                      t: "Shape the record",
+                      b: "Arrangement and production choices that serve emotion. Add only what the song needs.",
                     },
                     {
-                      t: "Finishing with intention",
-                      b: "We bring the song to a place where it feels complete and honest, whether that’s a rough recording or a full demo. You develop the skills to create something authentic to you.",
+                      t: "Finish with intention",
+                      b: "Get to a real finish. Rough recording or full demo. Build repeatable habits so the next song comes easier.",
                     },
                   ].map((s, i) => (
                     <motion.div
@@ -271,8 +277,72 @@ export default function Page() {
                   ))}
                 </div>
                 <p className="mx-auto mt-6 max-w-2xl text-center text-sm text-zinc-400">
-                  Whether you’ve never opened a DAW or already produce, each
-                  session builds toward songs that feel real and sound like you.
+                  Whether you have never opened a DAW or already produce, we
+                  build toward songs that feel real and sound like you.
+                </p>
+              </motion.div>
+            )}
+
+            {active === "deepdives" && (
+              <motion.div
+                key="deepdives"
+                variants={fade}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="p-8"
+              >
+                <h2 className="text-center text-2xl font-bold">
+                  Optional deep dives
+                </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-center text-zinc-300">
+                  Extras we can add if it helps your goals. These cover modern
+                  tools, the science of why songs work, and advanced production.
+                </p>
+
+                <div className="mx-auto mt-8 grid max-w-3xl gap-4">
+                  {[
+                    {
+                      t: "AI in songwriting and production",
+                      b: "Co-writing prompts, idea mining from voice notes, stem separation for practice, arrangement assistants, and simple guardrails for credits, rights, and privacy.",
+                    },
+                    {
+                      t: "Psychoacoustics and perception",
+                      b: "Masking, loudness, spatial cues, and why certain intervals hit. Use this to shape hook focus and mix moves that land.",
+                    },
+                    {
+                      t: "Advanced writing labs",
+                      b: "Prosody, motif development, tension and release, harmonic rhythm, reharmonization, secondary dominance, and tasteful modal color.",
+                    },
+                    {
+                      t: "Production master topics",
+                      b: "Gain staging that translates, transient and space design, parallel chains, mid side choices, stereo field management, phase awareness, and bounce workflows.",
+                    },
+                    {
+                      t: "Plugins and gear on a budget",
+                      b: "Best value chains under 100, free tools that punch up, utilities that matter, monitoring basics, and smart upgrade paths.",
+                    },
+                    {
+                      t: "Release pipeline",
+                      b: "From demo to master, loudness targets, export settings, metadata habits, and checklists for collaborators and distributors.",
+                    },
+                  ].map((s, i) => (
+                    <motion.div
+                      key={s.t}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-10% 0%" }}
+                      transition={{ delay: i * 0.05, duration: 0.4 }}
+                      className="rounded-2xl bg-zinc-900/60 p-5 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                    >
+                      <div className="text-lg font-semibold">{s.t}</div>
+                      <p className="mt-1 text-zinc-300">{s.b}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <p className="mx-auto mt-6 max-w-2xl text-center text-sm text-zinc-400">
+                  Tell me what you want to prioritize in your intro email.
                 </p>
               </motion.div>
             )}
@@ -290,8 +360,8 @@ export default function Page() {
                   Start a conversation
                 </h2>
                 <p className="mx-auto mt-3 max-w-2xl text-zinc-300">
-                  Tell me where you’re at and what you want to make. I’ll reply
-                  with a short plan for the next few weeks.
+                  Tell me where you are at and what you want to make. I will
+                  reply with a short plan for the next few weeks.
                 </p>
                 <a
                   href="mailto:rosesblake@yahoo.com?subject=Barehook"
