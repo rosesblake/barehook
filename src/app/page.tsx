@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   motion,
   AnimatePresence,
@@ -32,6 +32,32 @@ export default function Page() {
   const [active, setActive] =
     useState<(typeof tabs)[number]["key"]>("overview");
 
+  useEffect(() => {
+    const linkId = "calendly-widget-css";
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement("link");
+      link.id = linkId;
+      link.href = "https://assets.calendly.com/assets/external/widget.css";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    const scriptId = "calendly-widget-js";
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "https://assets.calendly.com/assets/external/widget.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  const openCalendly = useCallback(() => {
+    // @ts-ignore
+    window.Calendly?.initPopupWidget({
+      url: "https://calendly.com/dazyfacemusic/barehook-intro-call",
+    });
+  }, []);
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-50 antialiased">
       <div className="pointer-events-none absolute inset-0">
@@ -41,7 +67,6 @@ export default function Page() {
         <div className="absolute inset-0 [mask-image:radial-gradient(60rem_40rem_at_50%_0%,#000_45%,transparent_70%)]" />
       </div>
 
-      {/* Header (brand only, no nav) */}
       <header className="fixed top-0 z-30 w-full border-b border-white/5 bg-zinc-950/70 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           <a
@@ -53,7 +78,6 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="relative mx-auto max-w-4xl px-6 pt-24 md:pt-28 pb-8 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -83,8 +107,9 @@ export default function Page() {
           transition={{ delay: 0.16, duration: 0.5, ease: easePrimary }}
           className="mx-auto mt-8"
         >
-          <a
-            href="mailto:rosesblake@yahoo.com?subject=Barehook"
+          <button
+            type="button"
+            onClick={openCalendly}
             className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 shadow-sm ring-1 ring-black/10 transition hover:translate-y-[-1px]"
           >
             <span>Free introductory call</span>
@@ -97,7 +122,7 @@ export default function Page() {
             >
               <path d="M5 12h11.17l-4.58-4.59L13 6l7 7-7 7-1.41-1.41L16.17 13H5z" />
             </svg>
-          </a>
+          </button>
           <div className="mt-3 text-sm">
             <a
               href="https://credits.muso.ai/profile/70099920-e044-4530-a5aa-ab7749582fe0"
@@ -120,7 +145,6 @@ export default function Page() {
         </motion.div>
       </section>
 
-      {/* Studio ribbon */}
       <section
         id="about"
         className="relative isolate mx-auto max-w-5xl px-6 pb-16"
@@ -167,7 +191,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Tabs */}
       <section className="relative mx-auto max-w-4xl px-6 pb-28">
         <div className="mx-auto flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-900/40 p-2 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
           {tabs.map((t) => (
@@ -228,7 +251,6 @@ export default function Page() {
               </motion.div>
             )}
 
-            {/* RESTORED: your original "Session flow" copy */}
             {active === "process" && (
               <motion.div
                 key="process"
