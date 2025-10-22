@@ -110,7 +110,7 @@ export default function Page() {
           <button
             type="button"
             onClick={openCalendly}
-            className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 shadow-sm ring-1 ring-black/10 transition hover:translate-y-[-1px]"
+            className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 shadow-sm ring-1 ring-black/10 transition hover:translate-y-[-1px] cursor-pointer"
           >
             <span>Free introductory call</span>
             <svg
@@ -197,7 +197,7 @@ export default function Page() {
             <button
               key={t.key}
               onClick={() => setActive(t.key)}
-              className={`relative rounded-xl px-4 py-2 text-sm font-semibold transition ${
+              className={`relative rounded-xl px-4 py-2 text-sm font-semibold transition cursor-pointer ${
                 active === t.key
                   ? "text-zinc-900"
                   : "text-zinc-300 hover:text-zinc-100"
