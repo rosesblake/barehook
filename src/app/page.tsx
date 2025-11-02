@@ -6,57 +6,87 @@ import {
   AnimatePresence,
   cubicBezier,
   type Variants,
+  useReducedMotion,
 } from "framer-motion";
 import Image from "next/image";
 
 const tabs = [
   { key: "overview", label: "Overview" },
   { key: "process", label: "Session flow" },
+  { key: "pricing", label: "Pricing" },
   { key: "contact", label: "Contact" },
 ] as const;
 
 const easePrimary = cubicBezier(0.22, 1, 0.36, 1);
 const easeRibbon = cubicBezier(0.16, 1, 0.3, 1);
 
-const fade: Variants = {
-  initial: { opacity: 0, y: 12 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: easePrimary },
-  },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.25 } },
-};
-
 export default function Page() {
   const [active, setActive] =
     useState<(typeof tabs)[number]["key"]>("overview");
 
-  useEffect(() => {
-    const linkId = "calendly-widget-css";
-    if (!document.getElementById(linkId)) {
+  const prefersReduced = useReducedMotion();
+
+  const fade: Variants = {
+    initial: prefersReduced ? { opacity: 0 } : { opacity: 0, y: 12 },
+    animate: prefersReduced
+      ? { opacity: 1, transition: { duration: 0.25 } }
+      : { opacity: 1, y: 0, transition: { duration: 0.45, ease: easePrimary } },
+    exit: prefersReduced
+      ? { opacity: 0 }
+      : { opacity: 0, y: -8, transition: { duration: 0.25 } },
+  };
+
+  const [calendlyReady, setCalendlyReady] = useState(false);
+
+  const loadCalendly = useCallback(() => {
+    if (calendlyReady) return;
+
+    if (!document.getElementById("calendly-widget-css")) {
       const link = document.createElement("link");
-      link.id = linkId;
+      link.id = "calendly-widget-css";
       link.href = "https://assets.calendly.com/assets/external/widget.css";
       link.rel = "stylesheet";
       document.head.appendChild(link);
     }
-    const scriptId = "calendly-widget-js";
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "https://assets.calendly.com/assets/external/widget.js";
-      script.async = true;
-      document.body.appendChild(script);
+
+    if (!document.getElementById("calendly-widget-js")) {
+      const s = document.createElement("script");
+      s.id = "calendly-widget-js";
+      s.src = "https://assets.calendly.com/assets/external/widget.js";
+      s.async = true;
+      s.onload = () => setCalendlyReady(true);
+      document.body.appendChild(s);
+    } else {
+      setCalendlyReady(true);
     }
-  }, []);
+  }, [calendlyReady]);
 
   const openCalendly = useCallback(() => {
-    // @ts-ignore
-    window.Calendly?.initPopupWidget({
-      url: "https://calendly.com/dazyfacemusic/barehook-intro-call",
-    });
-  }, []);
+    loadCalendly();
+    const tryOpen = () => {
+      // @ts-ignore
+      if (window.Calendly?.initPopupWidget) {
+        // @ts-ignore
+        window.Calendly.initPopupWidget({
+          url: "https://calendly.com/barehook/barehook-intro-call",
+        });
+      } else {
+        requestAnimationFrame(tryOpen);
+      }
+    };
+    tryOpen();
+  }, [loadCalendly]);
+
+  const handleTabKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const order = ["overview", "process", "pricing", "contact"] as const;
+    const i = order.indexOf(active);
+    if (e.key === "ArrowRight") {
+      setActive(order[(i + 1) % order.length]);
+    }
+    if (e.key === "ArrowLeft") {
+      setActive(order[(i - 1 + order.length) % order.length]);
+    }
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-50 antialiased">
@@ -80,8 +110,8 @@ export default function Page() {
 
       <section className="relative mx-auto max-w-4xl px-6 pt-24 md:pt-28 pb-8 text-center">
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
+          animate={prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: easePrimary }}
           className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[0.95]"
         >
@@ -90,20 +120,19 @@ export default function Page() {
           </span>
         </motion.h1>
         <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={{ delay: 0.08, duration: 0.5 }}
           className="mx-auto mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-zinc-300"
         >
-          {" "}
-          We’ll write the song you meant to write. If you want, we’ll also demo
-          or fully produce it. The goal is simple: a song you’re proud of and a
-          way to make the next one. No exams, just real studio methods.{" "}
+          Learn modern songwriting and production in a lesson format. We focus
+          on finishing songs you are proud of and on building a repeatable
+          process.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
+          animate={prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={{ delay: 0.16, duration: 0.5, ease: easePrimary }}
           className="mx-auto mt-8"
         >
@@ -123,11 +152,30 @@ export default function Page() {
               <path d="M5 12h11.17l-4.58-4.59L13 6l7 7-7 7-1.41-1.41L16.17 13H5z" />
             </svg>
           </button>
-          <div className="mt-3 text-sm">
+          <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
+            <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <Image
+                src="/profile-image.jpg"
+                alt="Blake Roses"
+                width={28}
+                height={28}
+                className="rounded-full ring-1 ring-white/10 shrink-0"
+                priority
+              />
+              <span>
+                <span className="font-semibold text-zinc-200">Blake Roses</span>{" "}
+              </span>
+            </div>
+
+            <span className="hidden sm:inline select-none text-zinc-600">
+              •
+            </span>
             <a
               href="https://credits.muso.ai/profile/70099920-e044-4530-a5aa-ab7749582fe0"
               target="_blank"
-              className="inline-flex items-center gap-2 text-zinc-300 hover:text-zinc-100 underline-offset-4 hover:underline"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-zinc-100 underline-offset-4 hover:underline"
+              aria-label="See Blake Roses credits on Muso.AI (opens in a new tab)"
             >
               <span>See credits</span>
               <svg
@@ -151,15 +199,21 @@ export default function Page() {
       >
         <div className="relative overflow-hidden rounded-3xl border border-white/10">
           <motion.div
-            initial={{ scale: 1.05, opacity: 0.95 }}
-            whileInView={{ scale: 1, opacity: 1 }}
+            initial={
+              prefersReduced
+                ? { opacity: 0.95 }
+                : { scale: 1.05, opacity: 0.95 }
+            }
+            whileInView={
+              prefersReduced ? { opacity: 1 } : { scale: 1, opacity: 1 }
+            }
             viewport={{ once: true, margin: "-10% 0%" }}
             transition={{ duration: 0.9, ease: easeRibbon }}
             className="group relative h-[18rem] md:h-[24rem] overflow-hidden"
           >
             <Image
               src="/blake-studio.jpg"
-              alt=""
+              alt="Blake Roses in studio"
               fill
               sizes="(max-width: 768px) 100vw, 960px"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
@@ -175,16 +229,17 @@ export default function Page() {
                 Write first. Produce when it serves the song.
               </h3>
               <p className="mt-3 text-zinc-300">
-                I am a songwriter and producer from Los Angeles, mentored by Jon
-                Lundin of Point North. Before producing I was the singer of Oh,
-                Weatherly, a band that reached over 15 million streams. I have
-                worked with artists including Plain White T’s, We The Kings, and
-                As It Is.
+                I’m <span className="font-semibold">Blake Roses</span>, a
+                songwriter and producer from Los Angeles, mentored by Jon Lundin
+                of Point North. Before producing I was the singer of Oh,
+                Weatherly (15M+ streams). I’ve worked with artists including
+                Plain White T’s, We The Kings, and As It Is.
               </p>
+
               <p className="mt-3 text-zinc-300">
-                My focus is helping you channel how you feel into song and using
-                recording or production only when it serves your goals. The aim
-                is to finish work you are proud of.
+                Lessons focus on your voice as a writer and practical studio
+                methods. We’ll use recording and production as tools to finish
+                work you are proud of.
               </p>
             </div>
           </div>
@@ -192,33 +247,50 @@ export default function Page() {
       </section>
 
       <section className="relative mx-auto max-w-4xl px-6 pb-28">
-        <div className="mx-auto flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-900/40 p-2 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-          {tabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActive(t.key)}
-              className={`relative rounded-xl px-4 py-2 text-sm font-semibold transition cursor-pointer ${
-                active === t.key
-                  ? "text-zinc-900"
-                  : "text-zinc-300 hover:text-zinc-100"
-              }`}
-            >
-              {active === t.key && (
-                <motion.span
-                  layoutId="pill"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-white to-white/90 shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset]"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <span className="relative">{t.label}</span>
-            </button>
-          ))}
+        {/* Accessible Tablist */}
+        <div
+          role="tablist"
+          aria-label="Barehook sections"
+          className="mx-auto flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-900/40 p-2 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+          onKeyDown={handleTabKey}
+        >
+          {tabs.map((t) => {
+            const selected = active === t.key;
+            return (
+              <button
+                key={t.key}
+                role="tab"
+                aria-selected={selected}
+                aria-controls={`${t.key}-panel`}
+                id={`${t.key}-tab`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActive(t.key)}
+                className={`relative rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 transition cursor-pointer ${
+                  selected
+                    ? "text-zinc-900"
+                    : "text-zinc-300 hover:text-zinc-100"
+                }`}
+              >
+                {selected && (
+                  <motion.span
+                    layoutId="pill"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-white to-white/90 shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset]"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative">{t.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="relative mt-8 overflow-hidden rounded-3xl bg-zinc-900/40 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
           <AnimatePresence mode="wait">
             {active === "overview" && (
               <motion.div
+                role="tabpanel"
+                id="overview-panel"
+                aria-labelledby="overview-tab"
                 key="overview"
                 variants={fade}
                 initial="initial"
@@ -228,7 +300,9 @@ export default function Page() {
               >
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="rounded-2xl bg-zinc-900/60 p-6 backdrop-blur-sm ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                    <h3 className="text-xl font-semibold">Songwriting</h3>
+                    <h3 className="text-xl font-semibold">
+                      Songwriting lessons
+                    </h3>
                     <p className="mt-2 text-zinc-300">
                       How songs start, shaping verses and choruses, writing in a
                       way that feels like you.
@@ -236,11 +310,11 @@ export default function Page() {
                   </div>
                   <div className="rounded-2xl bg-zinc-900/60 p-6 backdrop-blur-sm ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                     <h3 className="text-xl font-semibold">
-                      Songwriting + Production
+                      Songwriting + production lessons
                     </h3>
                     <p className="mt-2 text-zinc-300">
-                      Same writing focus, plus production. From simple demos to
-                      advanced sessions. We expand only when it adds meaning.
+                      Same writing focus, plus studio skills. From simple demos
+                      to advanced sessions, only when it adds meaning.
                     </p>
                   </div>
                 </div>
@@ -253,6 +327,9 @@ export default function Page() {
 
             {active === "process" && (
               <motion.div
+                role="tabpanel"
+                id="process-panel"
+                aria-labelledby="process-tab"
                 key="process"
                 variants={fade}
                 initial="initial"
@@ -265,33 +342,36 @@ export default function Page() {
                 </h2>
                 <p className="mx-auto mt-3 max-w-2xl text-center text-zinc-300">
                   Every artist starts from a different place. Some come in with
-                  full songs, others just a voice note or an idea. We start
-                  where you are and build from there, covering both the creative
-                  and practical sides of songwriting.
+                  full songs, others a voice note or an idea. We start where you
+                  are and build from there.
                 </p>
                 <div className="mx-auto mt-8 grid max-w-3xl gap-4">
                   {[
                     {
                       t: "Understanding your voice as a writer",
-                      b: "We get to know what draws emotion out of you and what you want to say. This shapes the foundation of your songwriting.",
+                      b: "What draws emotion out of you and what you want to say shapes the work.",
                     },
                     {
                       t: "Songwriting fundamentals",
-                      b: "If you’re new, we cover melody, rhythm, chords, and how songs are built. If you already write, we focus on refining your instincts.",
+                      b: "If you’re new, we cover melody, rhythm, chords, and how songs are built. If you already write, we refine your instincts.",
                     },
                     {
                       t: "Building your sound",
-                      b: "You’ll learn how arrangement and production can shape a song without overcomplicating it. We add as much or as little as your goals need.",
+                      b: "How arrangement and production shape a song without overcomplicating it.",
                     },
                     {
                       t: "Finishing with intention",
-                      b: "We bring the song to a place where it feels complete and honest, whether that’s a rough recording or a full demo. You develop the skills to create something authentic to you.",
+                      b: "Bring a song to a place that feels complete and honest, from rough recording to demo.",
                     },
                   ].map((s, i) => (
                     <motion.div
                       key={s.t}
-                      initial={{ opacity: 0, y: 12 }}
-                      whileInView={{ opacity: 1, y: 0 }}
+                      initial={
+                        prefersReduced ? { opacity: 0 } : { opacity: 0, y: 12 }
+                      }
+                      whileInView={
+                        prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0 }
+                      }
                       viewport={{ once: true, margin: "-10% 0%" }}
                       transition={{ delay: i * 0.05, duration: 0.4 }}
                       className="rounded-2xl bg-zinc-900/60 p-5 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
@@ -308,8 +388,76 @@ export default function Page() {
               </motion.div>
             )}
 
+            {active === "pricing" && (
+              <motion.div
+                role="tabpanel"
+                id="pricing-panel"
+                aria-labelledby="pricing-tab"
+                key="pricing"
+                variants={fade}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="p-8 text-center"
+              >
+                <h2 className="text-2xl font-bold">Pricing</h2>
+                <p className="mx-auto mt-3 max-w-2xl text-zinc-300">
+                  Lessons are <span className="font-semibold">25% off</span>{" "}
+                  right now.
+                </p>
+
+                <div className="mx-auto mt-8 flex flex-col gap-4 max-w-sm">
+                  {[
+                    {
+                      t: "Single Session (60 min)",
+                      original: "$85",
+                      sale: "$64",
+                    },
+                    { t: "4-Session Block", original: "$300", sale: "$225" },
+                  ].map((x) => (
+                    <div
+                      key={x.t}
+                      className="rounded-2xl bg-zinc-900/60 p-6 ring-1 ring-white/10"
+                    >
+                      <h3 className="text-lg font-semibold">{x.t}</h3>
+                      <div className="mt-3 flex items-center justify-center gap-2">
+                        <span className="text-zinc-500 text-sm line-through">
+                          {x.original}
+                        </span>
+                        <span className="text-2xl font-bold text-white">
+                          {x.sale}
+                        </span>
+                        <span className="ml-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-[2px] text-xs text-emerald-300">
+                          25% off
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={openCalendly}
+                  className="cursor-pointer mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 ring-1 ring-black/10 transition hover:translate-y-[-1px]"
+                >
+                  Book free intro call
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    fill="currentColor"
+                  >
+                    <path d="M5 12h11.17l-4.58-4.59L13 6l7 7-7 7-1.41-1.41L16.17 13H5z" />
+                  </svg>
+                </button>
+              </motion.div>
+            )}
+
             {active === "contact" && (
               <motion.div
+                role="tabpanel"
+                id="contact-panel"
+                aria-labelledby="contact-tab"
                 key="contact"
                 variants={fade}
                 initial="initial"
@@ -387,6 +535,11 @@ export default function Page() {
         @keyframes slowspin {
           to {
             transform: rotate(1turn);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-[slowspin_18s_linear_infinite] {
+            animation: none !important;
           }
         }
       `}</style>
