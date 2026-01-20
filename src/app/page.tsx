@@ -163,7 +163,9 @@ export default function Page() {
                 priority
               />
               <span>
-                <span className="font-semibold text-zinc-200">Blake Roses</span>{" "}
+                <span className="font-semibold text-zinc-200">
+                  Blake Roses
+                </span>{" "}
               </span>
             </div>
 
@@ -233,7 +235,7 @@ export default function Page() {
                 songwriter and producer from Los Angeles, mentored by Jon Lundin
                 of Point North. Before producing I was the singer of Oh,
                 Weatherly (15M+ streams). I’ve worked with artists including
-                Plain White T’s, We The Kings, and As It Is.
+                Plain White T’s, We The Kings, SiM and As It Is.
               </p>
 
               <p className="mt-3 text-zinc-300">
