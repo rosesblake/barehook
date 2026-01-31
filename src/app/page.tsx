@@ -257,8 +257,8 @@ export default function Page() {
               <p className="mt-3 text-zinc-300">
                 I’m <span className="font-semibold">Blake Roses</span>, a Los
                 Angeles producer and songwriter. Mentored by Jon Lundin (Point
-                North). Former singer of Oh, Weatherly. Credits include Plain
-                White T’s, We The Kings, SiM, and As It Is.
+                North). Former singer of Oh, Weatherly (15M+ streams). Credits
+                include Plain White T’s, We The Kings, SiM, and As It Is.
               </p>
             </div>
           </div>
