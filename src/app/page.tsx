@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   motion,
   AnimatePresence,
@@ -13,7 +13,6 @@ import Image from "next/image";
 const tabs = [
   { key: "overview", label: "Overview" },
   { key: "process", label: "Session flow" },
-  { key: "pricing", label: "Pricing" },
   { key: "contact", label: "Contact" },
 ] as const;
 
@@ -78,7 +77,7 @@ export default function Page() {
   }, [loadCalendly]);
 
   const handleTabKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const order = ["overview", "process", "pricing", "contact"] as const;
+    const order = ["overview", "process", "contact"] as const;
     const i = order.indexOf(active);
     if (e.key === "ArrowRight") {
       setActive(order[(i + 1) % order.length]);
@@ -116,7 +115,7 @@ export default function Page() {
           className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[0.95]"
         >
           <span className="bg-clip-text text-transparent bg-[linear-gradient(180deg,#fff,rgba(255,255,255,0.85))]">
-            Let's Write.
+            Real sessions. Real songs.
           </span>
         </motion.h1>
         <motion.p
@@ -125,9 +124,8 @@ export default function Page() {
           transition={{ delay: 0.08, duration: 0.5 }}
           className="mx-auto mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-zinc-300"
         >
-          Learn modern songwriting and production in a lesson format. We focus
-          on finishing songs you are proud of and on building a repeatable
-          process.
+          One-on-one sessions focused on making songs better. We work in real
+          time and leave with something clearer, stronger, or finished.
         </motion.p>
 
         <motion.div
@@ -141,7 +139,7 @@ export default function Page() {
             onClick={openCalendly}
             className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 shadow-sm ring-1 ring-black/10 transition hover:translate-y-[-1px] cursor-pointer"
           >
-            <span>Free introductory call</span>
+            <span>Book an intro call</span>
             <svg
               viewBox="0 0 24 24"
               width="18"
@@ -163,9 +161,7 @@ export default function Page() {
                 priority
               />
               <span>
-                <span className="font-semibold text-zinc-200">
-                  Blake Roses
-                </span>{" "}
+                <span className="font-semibold text-zinc-200">Blake Roses</span>{" "}
               </span>
             </div>
 
@@ -190,6 +186,25 @@ export default function Page() {
                 <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3z" />
                 <path d="M5 5h7v2H7v10h10v-5h2v7H5z" />
               </svg>
+            </a>
+            <span className="hidden sm:inline select-none text-zinc-600">
+              •
+            </span>
+            <a
+              href="https://instagram.com/dazyfacemusic"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-300 underline-offset-4 hover:underline"
+            >
+              <Image
+                src="/instagram-logo.svg"
+                alt="Instagram"
+                width={24}
+                height={24}
+                className="rounded-full ring-1 ring-white/10 shrink-0"
+                priority
+              />
+              <span>@dazyfacemusic</span>
             </a>
           </div>
         </motion.div>
@@ -231,17 +246,19 @@ export default function Page() {
                 Write first. Produce when it serves the song.
               </h3>
               <p className="mt-3 text-zinc-300">
-                I’m <span className="font-semibold">Blake Roses</span>, a
-                songwriter and producer from Los Angeles, mentored by Jon Lundin
-                of Point North. Before producing I was the singer of Oh,
-                Weatherly (15M+ streams). I’ve worked with artists including
-                Plain White T’s, We The Kings, SiM and As It Is.
+                We start wherever you are. No pressure, no expectations, just
+                working toward something better than where you started.{" "}
               </p>
 
               <p className="mt-3 text-zinc-300">
-                Lessons focus on your voice as a writer and practical studio
-                methods. We’ll use recording and production as tools to finish
-                work you are proud of.
+                You don’t need experience. You just need a reason to make music.
+              </p>
+
+              <p className="mt-3 text-zinc-300">
+                I’m <span className="font-semibold">Blake Roses</span>, a Los
+                Angeles producer and songwriter. Mentored by Jon Lundin (Point
+                North). Former singer of Oh, Weatherly. Credits include Plain
+                White T’s, We The Kings, SiM, and As It Is.
               </p>
             </div>
           </div>
@@ -302,28 +319,22 @@ export default function Page() {
               >
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="rounded-2xl bg-zinc-900/60 p-6 backdrop-blur-sm ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                    <h3 className="text-xl font-semibold">
-                      Songwriting lessons
-                    </h3>
+                    <h3 className="text-xl font-semibold">Songwriting</h3>
                     <p className="mt-2 text-zinc-300">
-                      How songs start, shaping verses and choruses, writing in a
-                      way that feels like you.
+                      Melody, lyrics, and structure. Figuring out what the song
+                      wants to be and helping it get there.
                     </p>
                   </div>
                   <div className="rounded-2xl bg-zinc-900/60 p-6 backdrop-blur-sm ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                     <h3 className="text-xl font-semibold">
-                      Songwriting + production lessons
+                      Songwriting + Production
                     </h3>
                     <p className="mt-2 text-zinc-300">
-                      Same writing focus, plus studio skills. From simple demos
-                      to advanced sessions, only when it adds meaning.
+                      Using production only when it helps the song. Building
+                      around the writing instead of covering it up.
                     </p>
                   </div>
                 </div>
-                <p className="mx-auto mt-6 max-w-2xl text-center text-sm text-zinc-300">
-                  You can blend both paths anytime. The song decides what it
-                  needs.
-                </p>
               </motion.div>
             )}
 
@@ -343,27 +354,26 @@ export default function Page() {
                   Session flow
                 </h2>
                 <p className="mx-auto mt-3 max-w-2xl text-center text-zinc-300">
-                  Every artist starts from a different place. Some come in with
-                  full songs, others a voice note or an idea. We start where you
-                  are and build from there.
+                  Sessions feel like real studio time. We listen, make choices,
+                  and move the song forward.
                 </p>
                 <div className="mx-auto mt-8 grid max-w-3xl gap-4">
                   {[
                     {
-                      t: "Understanding your voice as a writer",
-                      b: "What draws emotion out of you and what you want to say shapes the work.",
+                      t: "Find the block in your writing",
+                      b: "Sometimes it’s the writing. Sometimes it’s the arrangement. Sometimes it’s just uncertainty. We identify the real issue.",
                     },
                     {
-                      t: "Songwriting fundamentals",
-                      b: "If you’re new, we cover melody, rhythm, chords, and how songs are built. If you already write, we refine your instincts.",
+                      t: "Work on the song, not around it",
+                      b: "Lyrics, melody, chords, structure, or sound. We focus on the part that will change the song the most right now.",
                     },
                     {
-                      t: "Building your sound",
-                      b: "How arrangement and production shape a song without overcomplicating it.",
+                      t: "Commit",
+                      b: "We make choices and live with them long enough for the song to take shape.",
                     },
                     {
-                      t: "Finishing with intention",
-                      b: "Bring a song to a place that feels complete and honest, from rough recording to demo.",
+                      t: "Leave with direction",
+                      b: "You leave knowing what to work on next and why.",
                     },
                   ].map((s, i) => (
                     <motion.div
@@ -384,74 +394,9 @@ export default function Page() {
                   ))}
                 </div>
                 <p className="mx-auto mt-6 max-w-2xl text-center text-sm text-zinc-400">
-                  Whether you’ve never opened a DAW or already produce, each
-                  session builds toward songs that feel real and sound like you.
+                  Whether you’re just starting or already writing, the goal is
+                  the same: make something honest and better than it was before.
                 </p>
-              </motion.div>
-            )}
-
-            {active === "pricing" && (
-              <motion.div
-                role="tabpanel"
-                id="pricing-panel"
-                aria-labelledby="pricing-tab"
-                key="pricing"
-                variants={fade}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="p-8 text-center"
-              >
-                <h2 className="text-2xl font-bold">Pricing</h2>
-                <p className="mx-auto mt-3 max-w-2xl text-zinc-300">
-                  Lessons are <span className="font-semibold">25% off</span>{" "}
-                  right now.
-                </p>
-
-                <div className="mx-auto mt-8 flex flex-col gap-4 max-w-sm">
-                  {[
-                    {
-                      t: "Single Session (60 min)",
-                      original: "$85",
-                      sale: "$64",
-                    },
-                    { t: "4-Session Block", original: "$300", sale: "$225" },
-                  ].map((x) => (
-                    <div
-                      key={x.t}
-                      className="rounded-2xl bg-zinc-900/60 p-6 ring-1 ring-white/10"
-                    >
-                      <h3 className="text-lg font-semibold">{x.t}</h3>
-                      <div className="mt-3 flex items-center justify-center gap-2">
-                        <span className="text-zinc-500 text-sm line-through">
-                          {x.original}
-                        </span>
-                        <span className="text-2xl font-bold text-white">
-                          {x.sale}
-                        </span>
-                        <span className="ml-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-[2px] text-xs text-emerald-300">
-                          25% off
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={openCalendly}
-                  className="cursor-pointer mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 ring-1 ring-black/10 transition hover:translate-y-[-1px]"
-                >
-                  Book free intro call
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="currentColor"
-                  >
-                    <path d="M5 12h11.17l-4.58-4.59L13 6l7 7-7 7-1.41-1.41L16.17 13H5z" />
-                  </svg>
-                </button>
               </motion.div>
             )}
 
@@ -471,8 +416,8 @@ export default function Page() {
                   Start a conversation
                 </h2>
                 <p className="mx-auto mt-3 max-w-2xl text-zinc-300">
-                  Tell me where you are at and what you want to make. I will
-                  reply with a short plan for the next few weeks.
+                  Tell me what you’re trying to make and where you feel stuck.
+                  We’ll go from there.
                 </p>
                 <a
                   href="mailto:rosesblake@yahoo.com?subject=Barehook"
